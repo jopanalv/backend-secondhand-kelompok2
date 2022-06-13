@@ -1,1 +1,0 @@
-# backend-secondhand-kelompok2
