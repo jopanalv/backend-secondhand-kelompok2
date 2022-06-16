@@ -1,12 +1,13 @@
 // index.js
-const express = require("express");
+const express = require('express')
 const app = express();
+const router = require('./routes');
 
-app.use(express.json());
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
+// route
+app.use('/api/v1', router)
 
 // listen on port
 app.listen(5000, () => console.log("Server running at http://localhost:5000"));
