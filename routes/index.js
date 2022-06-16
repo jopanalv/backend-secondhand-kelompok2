@@ -1,6 +1,12 @@
 const express = require('express');
 const handler = require('../controllers/ProductController');
+const { getUsers, register, login } = require("../controllers/UserController");
 const router = express.Router();
+
+// Auth Router
+router.get("/api/v1/users", getUsers)
+router.post("/api/v1/register", register)
+router.post("/api/v1/login", login)
 
 // Product Router
 router.get('/products', handler.getAllProduct)
