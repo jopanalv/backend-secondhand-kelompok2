@@ -1,16 +1,18 @@
 // index.js
 const express = require("express");
-const router = require("./routes/index");
 const dotenv = require("dotenv");
-dotenv.config();
 const app = express();
+const router = require('./routes');
+const cookieParser = require('cookie-parser')
+const cors = require("cors");
 
-app.use(express.json());
-app.use(router);
+dotenv.config();
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(cors());
+app.use('/api/v1', router);
 
 // listen on port
 app.listen(5000, () => console.log("Server running at http://localhost:5000"));
