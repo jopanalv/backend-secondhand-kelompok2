@@ -1,35 +1,63 @@
-const models = require("../models");
+const {Users, Profiles} = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const users = models.Users;
 
 const getUsers = async (req, res) => {
   try {
-    const Users = await users.findAll();
-    res.json(Users);
+    const Users = await Users.findAll();
+    res.status(200).json(Users);
   } catch (error) {
     console.log(error);
   }
-};
+}
+
+const whoami = async (req, res) => {
+  const userId = req.params.id
+  try {
+    const user = await Profiles.findOne({
+      include: {
+        model: Users,
+        required: true
+      },
+      where: {
+        id: userId
+      }
+    })
+    res.status(200).json({
+      message: 'Success get user',
+      statusCode: 200,
+      data: user
+    })
+  } catch (error) {
+    res.json({
+      message: error.message
+    })
+  }
+}
+
 const register = async (req, res) => {
   const { name, email, password, role } = req.body;
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
   try {
-    await users.create({
-      name: name,
+    const user = await Users.create({
       email: email,
       password: hashPassword,
       role: role,
     });
-    res.json({ msg: "Register Success!" });
+    await Profiles.create({
+      UserId: user.id,
+      name: name
+    })
+    res.status(201).json({ msg: "Register Success!" });
   } catch (error) {
     console.log(error);
   }
-};
+}
+
 const login = async (req, res) => {
   try {
-    const User = await users.findAll({
+    const User = await Users.findAll({
       where: {
         email: req.body.email,
       },
@@ -58,7 +86,7 @@ const login = async (req, res) => {
         expiresIn: "30d",
       }
     );
-    await users.update(
+    await Users.update(
       { token: refreshToken },
       {
         where: {
@@ -70,10 +98,15 @@ const login = async (req, res) => {
       httpOnly: true,
       maxAge: 24 * 30 * 60 * 60 * 1000,
     });
-    res.json({ accessToken });
+    res.status(200).json({ accessToken });
   } catch (error) {
     res.status(404).json({ msg: "Username or Password didn't match!" });
   }
-};
+}
 
-module.exports = { getUsers, register, login };
+module.exports = { 
+  getUsers, 
+  register, 
+  login,
+  whoami
+};

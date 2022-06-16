@@ -61,12 +61,16 @@ const createProduct = async (req, res) => {
             })
         } else {
             const product = await Products.create({
-                ProfileId, name, description, CategoryId, price, image
+                ProfileId, 
+                name, 
+                description, 
+                CategoryId, 
+                price, 
+                image
             })
             res.status(201).json({
                 message: 'Success create product',
-                statusCode: 201,
-                data: product
+                statusCode: 201
             })
         }
     } catch (error) {
@@ -98,8 +102,7 @@ const updateProduct = async (req, res) => {
         })
         res.status(200).json({
             message: 'Success update product',
-            statusCode: 200,
-            data: product
+            statusCode: 200
         })
     } catch (error) {
         res.json({
