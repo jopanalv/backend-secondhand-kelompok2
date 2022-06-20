@@ -42,30 +42,57 @@ const getProduct = async (req, res) => {
     }
 }
 
+const getProductSeller = async (req, res) => {
+    const userId = req.params.id
+    try {
+        const profile = await Profiles.findOne({
+            where: { UserId: userId }
+        })
+        const product = await Products.findAll({
+            where: { ProfileId: profile.id }
+        })
+        res.status(200).json({
+            message: 'Success get seller product',
+            statusCode: 200,
+            data: product
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+
+}
+
 const createProduct = async (req, res) => {
     const {
-        ProfileId,
         name,
         description,
         CategoryId,
         price,
-        image,
     } = req.body;
+    const image = req.file.filename
     try {
+        const profile = await Profiles.findOne({
+            where: {
+                UserId: req.id
+            }
+        })
+        const ProfileId = profile.id
         const totalRecord = await Products.count({
             where: { ProfileId: ProfileId }
         })
-        if (totalRecord > 3) {
+        if (totalRecord >= 4) {
             res.json({
                 message: 'Jumlah post produk maksimal 4'
             })
         } else {
-            const product = await Products.create({
-                ProfileId, 
-                name, 
-                description, 
-                CategoryId, 
-                price, 
+            await Products.create({
+                ProfileId,
+                name,
+                description,
+                CategoryId,
+                price,
                 image
             })
             res.status(201).json({
@@ -86,9 +113,9 @@ const updateProduct = async (req, res) => {
         name,
         description,
         CategoryId,
-        price,
-        image,
+        price
     } = req.body;
+    const image = req.file.filename
     try {
         const product = await Products.findOne({
             where: { id: productId }
@@ -122,6 +149,7 @@ const deleteProduct = async (req, res) => {
 module.exports = {
     getAllProduct,
     getProduct,
+    getProductSeller,
     createProduct,
     updateProduct,
     deleteProduct
