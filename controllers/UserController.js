@@ -165,7 +165,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
-const upload = multer({
+const uploadProfileImages = multer({
   storage: storage,
   limits: { fileSize: "10000000" },
   fileFilter: (req, file, cb) => {
@@ -202,7 +202,7 @@ module.exports = {
   register,
   login,
   whoami,
-  upload,
+  uploadProfileImages,
   updateProfile,
   logout,
 };
