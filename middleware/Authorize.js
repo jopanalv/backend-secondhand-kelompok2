@@ -12,7 +12,9 @@ const authorize = (rolename) => {
             const payload = decodeToken(token)
 
             if (!!rolename && rolename != payload.role)
-                return res.sendStatus(403)
+                return res.status(403).json({
+                    message: `${payload.role} tidak dapat mengakses halaman ini!`
+                })
 
             req.user = payload;
             req.id = payload.userId

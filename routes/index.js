@@ -10,6 +10,7 @@ const {
   logout,
   uploadProfileImages,
 } = require("../controllers/UserController");
+const {buyProduct, getNotifBuyer, getNotifSeller, getTransactionHistoryBuyer, getTransactionHistorySeller} = require('../controllers/TransactionController');
 const { authorize } = require("../middleware/Authorize");
 const multer = require("multer");
 const path = require("path");
@@ -43,7 +44,7 @@ router.post("/profile/update", uploadProfileImages, updateProfile);
 router.get("/products", handler.getAllProduct);
 router.get("/products/:id", handler.getProduct);
 router.get(
-  "/products/seller/:id",
+  "/seller/products",
   authorize(accessControl.SELLER),
   handler.getProductSeller
 );
@@ -62,5 +63,12 @@ router.delete(
   authorize(accessControl.SELLER),
   handler.deleteProduct
 );
+
+// Transaction router
+router.get('/notif/buyer', authorize(accessControl.BUYER), getNotifBuyer);
+router.get('/notif/seller', authorize(accessControl.SELLER), getNotifSeller);
+router.get('/transaction/buyer', authorize(accessControl.BUYER), getTransactionHistoryBuyer);
+router.get('/transaction/seller', authorize(accessControl.SELLER), getTransactionHistorySeller);
+router.post('/buy/:id', authorize(accessControl.BUYER), buyProduct);
 
 module.exports = router;
