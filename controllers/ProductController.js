@@ -43,7 +43,7 @@ const getProduct = async (req, res) => {
 }
 
 const getProductSeller = async (req, res) => {
-    const userId = req.params.id
+    const userId = req.id
     try {
         const profile = await Profiles.findOne({
             where: { UserId: userId }
@@ -61,7 +61,6 @@ const getProductSeller = async (req, res) => {
             message: error.message
         })
     }
-
 }
 
 const createProduct = async (req, res) => {
