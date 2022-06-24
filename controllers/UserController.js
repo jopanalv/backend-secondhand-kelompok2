@@ -181,7 +181,7 @@ const uploadProfileImages = multer({
 }).single("image");
 const updateProfile = async (req, res) => {
   const { UserId, name, city, address, no_hp } = req.body;
-  const image = req.file.path;
+  const image = req.file.filename;
   try {
     await Profiles.update(
       { image, name, city, address, no_hp },

@@ -1,5 +1,30 @@
 const { Profiles, Products, Transactions } = require('../models')
 
+const detailTransaction = async (req, res) => {
+    const transactionId = req.params.id
+
+    try {
+        const transaction = await Transactions.findOne({
+            include: {
+                model: Profiles,
+                required: true
+            },
+            where: {
+                id: transactionId
+            }
+        })
+        res.status(200).json({
+            message: 'Success get detail transaction',
+            statusCode: 200,
+            data: transaction
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
 const getNotifSeller = async (req, res) => {
     const sellerId = req.id
     const status = 'pending'
@@ -139,10 +164,86 @@ const buyProduct = async (req, res) => {
     }
 }
 
+const acceptTransaction = async (req, res) => {
+    const transactionId = req.params.id
+    const status = 'accept'
+
+    try {
+        const transaction = await Transactions.findOne({
+            where: {
+                id: transactionId
+            }
+        })
+        await transaction.update({
+            status
+        })
+        res.status(200).json({
+            message: 'Success update status transaction',
+            statusCode: 200
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
+const cancelTransaction = async (req, res) => {
+    const transactionId = req.params.id
+    const status = 'cancel'
+
+    try {
+        const transaction = await Transactions.findOne({
+            where: {
+                id: transactionId
+            }
+        })
+        await transaction.update({
+            status
+        })
+        res.status(200).json({
+            message: 'Success update status transaction',
+            statusCode: 200
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
+const successTransaction = async (req, res) => {
+    const transactionId = req.params.id
+    const status = 'success'
+
+    try {
+        const transaction = await Transactions.findOne({
+            where: {
+                id: transactionId
+            }
+        })
+        await transaction.update({
+            status
+        })
+        res.status(200).json({
+            message: 'Success update status transaction',
+            statusCode: 200
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
 module.exports = {
     buyProduct,
     getTransactionHistoryBuyer,
     getTransactionHistorySeller,
     getNotifSeller,
-    getNotifBuyer
+    getNotifBuyer,
+    detailTransaction,
+    acceptTransaction,
+    cancelTransaction,
+    successTransaction
 }

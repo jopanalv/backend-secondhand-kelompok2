@@ -10,7 +10,17 @@ const {
   logout,
   uploadProfileImages,
 } = require("../controllers/UserController");
-const {buyProduct, getNotifBuyer, getNotifSeller, getTransactionHistoryBuyer, getTransactionHistorySeller} = require('../controllers/TransactionController');
+const {
+  buyProduct,
+  getNotifBuyer,
+  getNotifSeller,
+  getTransactionHistoryBuyer,
+  getTransactionHistorySeller,
+  detailTransaction,
+  acceptTransaction,
+  cancelTransaction,
+  successTransaction
+} = require('../controllers/TransactionController');
 const { authorize } = require("../middleware/Authorize");
 const multer = require("multer");
 const path = require("path");
@@ -69,6 +79,10 @@ router.get('/notif/buyer', authorize(accessControl.BUYER), getNotifBuyer);
 router.get('/notif/seller', authorize(accessControl.SELLER), getNotifSeller);
 router.get('/transaction/buyer', authorize(accessControl.BUYER), getTransactionHistoryBuyer);
 router.get('/transaction/seller', authorize(accessControl.SELLER), getTransactionHistorySeller);
+router.get('/transaction/detail/:id', authorize(accessControl.SELLER), detailTransaction);
 router.post('/buy/:id', authorize(accessControl.BUYER), buyProduct);
+router.put('/accept/:id', authorize(accessControl.SELLER), acceptTransaction);
+router.put('/cancel/:id', authorize(accessControl.SELLER), cancelTransaction);
+router.put('/success/:id', authorize(accessControl.SELLER), successTransaction);
 
 module.exports = router;
