@@ -5,6 +5,7 @@ const app = express();
 const router = require("./routes");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const PORT = process.env.PORT || 8000;
 
 dotenv.config();
 
@@ -16,4 +17,4 @@ app.use("/api/v1", router);
 app.use("/upload/images", express.static("./upload/images"));
 
 // listen on port
-app.listen(5000, () => console.log("Server running at http://localhost:5000"));
+app.listen(PORT, () => console.log("Server running at http://localhost:",PORT));
