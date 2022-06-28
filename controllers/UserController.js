@@ -7,13 +7,16 @@ const path = require("path");
 const getUsers = async (req, res) => {
   try {
     const users = await Users.findAll({
+      attributes: ["id", "email", "role"],
       include: {
         model: Profiles,
         required: true,
         attributes: ["image", "name", "address", "no_hp"],
       },
     });
-    res.status(200).json(users);
+    res
+      .status(200)
+      .json({ message: "Success get all users", statusCode: 200, data: users });
   } catch (error) {
     console.log(error);
   }
@@ -22,31 +25,31 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await Profiles.findOne({
+    const users = await Users.findOne({
+      attributes: ["id", "email", "role"],
       include: {
-        model: Users,
+        model: Profiles,
         required: true,
+        attributes: ["image", "name", "address", "no_hp"],
       },
       where: {
         id: userId,
       },
     });
-    if (!user) {
+    if (!users) {
       res.status(404).json({
-        message: "User Didn't Exist",
+        message: "User does not exist",
         statusCode: 404,
       });
     } else {
       res.status(200).json({
         message: "Success get user",
         statusCode: 200,
-        data: user,
+        data: users,
       });
     }
   } catch (error) {
-    res.json({
-      message: error.message,
-    });
+    console.log(error);
   }
 };
 
@@ -64,7 +67,11 @@ const register = async (req, res) => {
       UserId: user.id,
       name: name,
     });
-    res.status(201).json({ msg: "Register Success!" });
+    res.status(201).json({
+      message: "Register success!",
+      statusCode: 201,
+      data: user,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -79,10 +86,10 @@ const login = async (req, res) => {
     });
     const match = await bcrypt.compare(req.body.password, user[0].password);
     if (!match) {
-      console.log("Password didn't match");
-      return res
-        .status(400)
-        .json({ msg: "Username or Password didn't match!" });
+      return res.status(403).json({
+        message: "Username or password do not match!",
+        statusCode: 403,
+      });
     }
     const userId = user[0].id;
     const email = user[0].email;
@@ -113,11 +120,17 @@ const login = async (req, res) => {
       httpOnly: true,
       maxAge: 24 * 30 * 60 * 60 * 1000,
     });
-    res.status(200).json({ accessToken });
+    res.status(302).json({
+      message: "Login success!",
+      statusCode: 302,
+      accessToken: accessToken,
+    });
   } catch (error) {
-    res.status(404).json({ msg: error });
+    console.log(error);
   }
 };
+
+// To fixed: who am i
 const whoami = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   try {
@@ -140,18 +153,35 @@ const whoami = async (req, res) => {
     console.log(error);
   }
 };
+
 const logout = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   try {
     if (!refreshToken) {
       return res.sendStatus(204);
-    } else {
-      res.clearCookie("refreshToken");
-      return res
-        .status(200)
-        .json({ success: true, message: "Logout Successfully" });
     }
+    const user = await Users.findOne({
+      where: {
+        token: refreshToken,
+      },
+    });
+    if (!user) {
+      return res.sendStatus(204);
+    }
+    const userId = user.id;
+    await Users.update(
+      { token: null },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+    res.clearCookie("refreshToken");
+    return res
+      .status(200)
+      .json({ statusCode: 200, success: true, message: "Logout Successfully" });
   } catch (error) {
     console.log(error);
   }
@@ -179,10 +209,20 @@ const uploadProfileImages = multer({
     cb("File format not allowed!");
   },
 }).single("image");
+
 const updateProfile = async (req, res) => {
   const { UserId, name, city, address, no_hp } = req.body;
   const image = req.file.filename;
+  const token = req.headers.authorization?.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   try {
+    if (UserId != decoded.userId) {
+      return res.status(403).json({
+        message: "Cannot update profile!",
+        statusCode: 403,
+      });
+    }
+
     await Profiles.update(
       { image, name, city, address, no_hp },
       {
@@ -191,7 +231,17 @@ const updateProfile = async (req, res) => {
         },
       }
     );
-    res.status(200).json({ msg: "Update Success", data: req.body });
+    const afterUpdate = await Profiles.findOne({
+      attributes: ["image", "name", "address", "no_hp"],
+      where: {
+        id: UserId,
+      },
+    });
+    res.status(200).json({
+      message: "Update profile Success!",
+      statusCode: 200,
+      data: afterUpdate,
+    });
   } catch (error) {
     console.log(error);
   }
