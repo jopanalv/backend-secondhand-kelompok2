@@ -213,15 +213,15 @@ const uploadProfileImages = multer({
 const updateProfile = async (req, res) => {
   const { UserId, name, city, address, no_hp } = req.body;
   const image = req.file.filename;
-  const token = req.headers.authorization?.split(" ")[1];
-  const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+  // const token = req.headers.authorization?.split(" ")[1];
+  // const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   try {
-    if (UserId != decoded.userId) {
-      return res.status(403).json({
-        message: "Cannot update profile!",
-        statusCode: 403,
-      });
-    }
+    // if (UserId != decoded.userId) {
+    //   return res.status(403).json({
+    //     message: "Cannot update profile!",
+    //     statusCode: 403,
+    //   });
+    // }
 
     await Profiles.update(
       { image, name, city, address, no_hp },
