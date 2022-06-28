@@ -50,7 +50,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
 router.get("/whoami", verifyToken, whoami);
-router.post("/profile/update", verifyToken, uploadProfileImages, updateProfile);
+router.post("/profile/update/:id", uploadProfileImages, updateProfile);
 router.get("/token", newToken);
 
 // Product Router
