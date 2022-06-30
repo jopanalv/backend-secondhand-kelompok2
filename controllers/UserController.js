@@ -208,6 +208,12 @@ const uploadProfileImages = multer({
     }
     cb("File format not allowed!");
   },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+    );
+  },
 }).single("image");
 
 const updateProfile = async (req, res) => {
