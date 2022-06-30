@@ -8,7 +8,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "db:create": "npx sequelize db:create",
-    "db:migrate": "npx sequelize db:migrate"
+    "db:migrate": "npx sequelize db:migrate",
+    "db:seed": "npx sequelize db:seed:all"
   },
   "author": "",
   "license": "ISC",
