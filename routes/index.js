@@ -56,6 +56,7 @@ router.get("/token", newToken);
 // Product Router
 router.get("/products", handler.getAllProduct);
 router.get("/products/:id", handler.getProduct);
+router.get("/category/list", handler.getListCategories);
 router.get(
   "/seller/products",
   authorize(accessControl.SELLER),
