@@ -58,7 +58,7 @@ const register = async (req, res) => {
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
   try {
-    const isEmailRegistered = await Users.findAll({
+    const isEmailRegistered = await Users.findOne({
       where: {
         email: email,
       },
