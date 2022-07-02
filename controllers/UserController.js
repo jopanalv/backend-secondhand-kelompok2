@@ -58,6 +58,20 @@ const register = async (req, res) => {
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
   try {
+    const isEmailRegistered = await Users.findOne({
+      where: {
+        email: email,
+      },
+    });
+    if (isEmailRegistered) {
+      return res
+        .status(409)
+        .json({
+          status: 409,
+          message: "Email already exist!",
+        })
+        .end();
+    }
     const user = await Users.create({
       email: email,
       password: hashPassword,
@@ -156,9 +170,16 @@ const whoami = async (req, res) => {
 
 const logout = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
-
   try {
     if (!refreshToken) {
+      // const googleLogout = await Users.findOne({
+      //   where: {
+      //     googleId: req.profile.googleId,
+      //   },
+      // });
+      // if (googleLogout) {
+      //   req.logout();
+      // }
       return res.sendStatus(204);
     }
     const user = await Users.findOne({
@@ -211,12 +232,12 @@ const uploadProfileImages = multer({
 }).single("image");
 
 const updateProfile = async (req, res) => {
-  const { UserId, name, city, address, no_hp } = req.body;
+  const UserId = req.user.userId;
+  const { name, city, address, no_hp } = req.body;
   const image = req.file.filename;
   const token = req.headers.authorization?.split(" ")[1];
-  const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   try {
-    if (UserId != decoded.userId) {
+    if (UserId != req.user.userId) {
       return res.status(403).json({
         message: "Cannot update profile!",
         statusCode: 403,

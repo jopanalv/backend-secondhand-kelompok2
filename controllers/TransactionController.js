@@ -1,5 +1,12 @@
 const { Profiles, Products, Transactions } = require('../models')
 
+statusTransaction = {
+    SUCCESS: 'success',
+    PENDING: 'pending',
+    ACCEPT: 'accept',
+    CANCEL: 'cancel'
+}
+
 const detailTransaction = async (req, res) => {
     const transactionId = req.params.id
 
@@ -27,7 +34,6 @@ const detailTransaction = async (req, res) => {
 
 const getNotifSeller = async (req, res) => {
     const sellerId = req.id
-    const status = 'pending'
 
     try {
         const notifSeller = await Transactions.findAll({
@@ -39,7 +45,7 @@ const getNotifSeller = async (req, res) => {
                 }
             },
             where: {
-                status
+                status: statusTransaction.PENDING
             }
         })
         res.status(200).json({
@@ -56,13 +62,12 @@ const getNotifSeller = async (req, res) => {
 
 const getNotifBuyer = async (req, res) => {
     const buyerId = req.id
-    const status = 'accept'
 
     try {
         const notifBuyer = await Transactions.findAll({
             where: {
                 ProfileId: buyerId,
-                status: status
+                status: statusTransaction.ACCEPT
             }
         })
         res.status(200).json({
@@ -79,13 +84,12 @@ const getNotifBuyer = async (req, res) => {
 
 const getTransactionHistoryBuyer = async (req, res) => {
     const buyerId = req.id
-    const status = 'success'
 
     try {
         const history = await Transactions.findAll({
             where: {
                 ProfileId: buyerId,
-                status
+                status: statusTransaction.SUCCESS
             }
         })
         res.status(200).json({
@@ -102,7 +106,6 @@ const getTransactionHistoryBuyer = async (req, res) => {
 
 const getTransactionHistorySeller = async (req, res) => {
     const sellerId = req.id
-    const status = 'success'
 
     try {
         const history = await Transactions.findAll({
@@ -114,7 +117,7 @@ const getTransactionHistorySeller = async (req, res) => {
                 }
             },
             where: {
-                status
+                status: statusTransaction.SUCCESS
             }
         })
         res.status(200).json({
@@ -133,7 +136,6 @@ const buyProduct = async (req, res) => {
     const buyerId = req.id
     const productId = req.params.id
     const offer_price = req.body.offer_price
-    const status = 'pending'
 
     try {
         const buyer = await Profiles.findOne({
@@ -150,7 +152,7 @@ const buyProduct = async (req, res) => {
                 ProfileId: buyerId,
                 ProductId: productId,
                 offer_price,
-                status
+                status: statusTransaction.PENDING
             })
             res.status(201).json({
                 message: 'Success buy product',
@@ -166,7 +168,6 @@ const buyProduct = async (req, res) => {
 
 const acceptTransaction = async (req, res) => {
     const transactionId = req.params.id
-    const status = 'accept'
 
     try {
         const transaction = await Transactions.findOne({
@@ -175,7 +176,7 @@ const acceptTransaction = async (req, res) => {
             }
         })
         await transaction.update({
-            status
+            status: statusTransaction.ACCEPT
         })
         res.status(200).json({
             message: 'Success update status transaction',
@@ -190,7 +191,6 @@ const acceptTransaction = async (req, res) => {
 
 const cancelTransaction = async (req, res) => {
     const transactionId = req.params.id
-    const status = 'cancel'
 
     try {
         const transaction = await Transactions.findOne({
@@ -199,7 +199,7 @@ const cancelTransaction = async (req, res) => {
             }
         })
         await transaction.update({
-            status
+            status: statusTransaction.CANCEL
         })
         res.status(200).json({
             message: 'Success update status transaction',
@@ -214,7 +214,6 @@ const cancelTransaction = async (req, res) => {
 
 const successTransaction = async (req, res) => {
     const transactionId = req.params.id
-    const status = 'success'
 
     try {
         const transaction = await Transactions.findOne({
@@ -223,7 +222,7 @@ const successTransaction = async (req, res) => {
             }
         })
         await transaction.update({
-            status
+            status: statusTransaction.SUCCESS
         })
         res.status(200).json({
             message: 'Success update status transaction',

@@ -1,4 +1,4 @@
-const { Products, Profiles } = require('../models');
+const { Products, Profiles, Categories } = require('../models');
 
 const getAllProduct = async (req, res) => {
     try {
@@ -138,11 +138,32 @@ const updateProduct = async (req, res) => {
 }
 
 const deleteProduct = async (req, res) => {
-    const productId = req.params.id
-    await Products.destroy({
-        where: { id: productId }
-    })
-    res.status(204).end()
+    try {
+        const productId = req.params.id
+        await Products.destroy({
+            where: { id: productId }
+        })
+        res.status(204).end()
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
+const getListCategories = async (req, res) => {
+    try {
+        const category = await Categories.findAll()
+        res.status(200).json({
+            message: 'Success get all categories',
+            statusCode: 200,
+            data: category
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
 }
 
 module.exports = {
@@ -151,5 +172,6 @@ module.exports = {
     getProductSeller,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getListCategories
 }
