@@ -45,9 +45,7 @@ const getProduct = async (req, res) => {
 const getProductSeller = async (req, res) => {
     const userId = req.id
     try {
-        const profile = await Profiles.findOne({
-            where: { UserId: userId }
-        })
+        const profile = await getProfileByRequest(userId)
         const product = await Products.findAll({
             where: { ProfileId: profile.id }
         })
@@ -70,13 +68,10 @@ const createProduct = async (req, res) => {
         CategoryId,
         price,
     } = req.body;
+    const userId = req.id
     const image = req.file.filename
     try {
-        const profile = await Profiles.findOne({
-            where: {
-                UserId: req.id
-            }
-        })
+        const profile = await getProfileByRequest(userId)
         const ProfileId = profile.id
         const totalRecord = await Products.count({
             where: { ProfileId: ProfileId }
@@ -164,6 +159,14 @@ const getListCategories = async (req, res) => {
             message: error.message
         })
     }
+}
+
+const getProfileByRequest = (id) => {
+    return Profiles.findOne({
+        where: {
+            UserId: id
+        }
+    })
 }
 
 module.exports = {

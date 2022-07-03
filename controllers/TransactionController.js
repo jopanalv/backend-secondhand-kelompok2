@@ -170,11 +170,7 @@ const acceptTransaction = async (req, res) => {
     const transactionId = req.params.id
 
     try {
-        const transaction = await Transactions.findOne({
-            where: {
-                id: transactionId
-            }
-        })
+        const transaction = await getTransactionByRequest(transactionId)
         await transaction.update({
             status: statusTransaction.ACCEPT
         })
@@ -193,11 +189,7 @@ const cancelTransaction = async (req, res) => {
     const transactionId = req.params.id
 
     try {
-        const transaction = await Transactions.findOne({
-            where: {
-                id: transactionId
-            }
-        })
+        const transaction = await getTransactionByRequest(transactionId)
         await transaction.update({
             status: statusTransaction.CANCEL
         })
@@ -216,11 +208,7 @@ const successTransaction = async (req, res) => {
     const transactionId = req.params.id
 
     try {
-        const transaction = await Transactions.findOne({
-            where: {
-                id: transactionId
-            }
-        })
+        const transaction = await getTransactionByRequest(transactionId)
         await transaction.update({
             status: statusTransaction.SUCCESS
         })
@@ -233,6 +221,14 @@ const successTransaction = async (req, res) => {
             message: error.message
         })
     }
+}
+
+const getTransactionByRequest = (id) => {
+    return Transactions.findOne({
+        where: {
+            id: id
+        }
+    })
 }
 
 module.exports = {
