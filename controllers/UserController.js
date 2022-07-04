@@ -1,8 +1,6 @@
 const { Users, Profiles } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const path = require("path");
 
 const getUsers = async (req, res) => {
   try {
@@ -208,34 +206,10 @@ const logout = async (req, res) => {
   }
 };
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "upload/images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-const uploadProfileImages = multer({
-  storage: storage,
-  limits: { fileSize: "10000000" },
-  fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg|jpg|png|gif/;
-    const mimeType = fileTypes.test(file.mimetype);
-    const extname = fileTypes.test(path.extname(file.originalname));
-
-    if (mimeType && extname) {
-      return cb(null, true);
-    }
-    cb("File format not allowed!");
-  },
-}).single("image");
-
 const updateProfile = async (req, res) => {
   const UserId = req.user.userId;
   const { name, city, address, no_hp } = req.body;
   const image = req.file.filename;
-  const token = req.headers.authorization?.split(" ")[1];
   try {
     if (UserId != req.user.userId) {
       return res.status(403).json({
@@ -273,7 +247,6 @@ module.exports = {
   register,
   login,
   whoami,
-  uploadProfileImages,
   updateProfile,
   logout,
 };

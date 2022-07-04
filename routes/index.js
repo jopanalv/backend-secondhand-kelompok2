@@ -8,7 +8,6 @@ const {
   whoami,
   updateProfile,
   logout,
-  uploadProfileImages,
 } = require("../controllers/UserController");
 const {
   buyProduct,
@@ -42,7 +41,20 @@ let storage = multer.diskStorage({
   },
 });
 
-let upload = multer({ storage: storage });
+let upload = multer({ 
+  storage: storage,
+  limits: { fileSize: "10000000" },
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|gif/;
+    const mimeType = fileTypes.test(file.mimetype);
+    const extname = fileTypes.test(path.extname(file.originalname));
+
+    if (mimeType && extname) {
+      return cb(null, true);
+    }
+    cb("File format not allowed!");
+  }, 
+});
 
 // Auth Router
 router.get("/users", verifyToken, getUsers);
@@ -55,7 +67,7 @@ router.get("/logout", (req, res) => {
   res.status(200).send("Logout Success");
 });
 router.get("/whoami", verifyToken, whoami);
-router.put("/profile/update", verifyToken, uploadProfileImages, updateProfile);
+router.put("/profile/update", [verifyToken, upload.single("image")], updateProfile);
 router.get("/token", newToken);
 
 //Auth Google
