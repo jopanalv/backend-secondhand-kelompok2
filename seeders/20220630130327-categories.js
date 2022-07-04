@@ -31,7 +31,7 @@ module.exports = {
          })
        })
      )
-   await queryInterface.bulkInsert('categories', categories, {})
+   await queryInterface.bulkInsert('Categories', categories, {})
   },
 
   async down (queryInterface, Sequelize) {
