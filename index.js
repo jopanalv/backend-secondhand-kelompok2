@@ -5,14 +5,10 @@ const app = express();
 const router = require("./routes");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-<<<<<<< HEAD
 const PORT = process.env.PORT || 5000;
 const cookieSession = require("cookie-session");
 const passport = require("passport");
 const initializePassport = require("./config/passport");
-=======
-const PORT = process.env.PORT || 8000;
->>>>>>> dd92613cca46cb75ff748e4baba718559dff3586
 
 initializePassport(passport);
 dotenv.config();
@@ -36,8 +32,4 @@ app.use("/api/v1", router);
 app.use("/upload/images", express.static("./upload/images"));
 
 // listen on port
-<<<<<<< HEAD
-app.listen(PORT, () => console.log("Server running at http://localhost:", PORT));
-=======
 app.listen(PORT, () => console.log("Server running at http://localhost:",PORT));
->>>>>>> dd92613cca46cb75ff748e4baba718559dff3586
