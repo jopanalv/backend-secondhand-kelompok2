@@ -1,4 +1,4 @@
-const { Products, Profiles } = require('../models');
+const { Products, Profiles, Categories } = require('../models');
 
 const getAllProduct = async (req, res) => {
     try {
@@ -45,9 +45,7 @@ const getProduct = async (req, res) => {
 const getProductSeller = async (req, res) => {
     const userId = req.id
     try {
-        const profile = await Profiles.findOne({
-            where: { UserId: userId }
-        })
+        const profile = await getProfileByRequest(userId)
         const product = await Products.findAll({
             where: { ProfileId: profile.id }
         })
@@ -70,13 +68,10 @@ const createProduct = async (req, res) => {
         CategoryId,
         price,
     } = req.body;
+    const userId = req.id
     const image = req.file.filename
     try {
-        const profile = await Profiles.findOne({
-            where: {
-                UserId: req.id
-            }
-        })
+        const profile = await getProfileByRequest(userId)
         const ProfileId = profile.id
         const totalRecord = await Products.count({
             where: { ProfileId: ProfileId }
@@ -138,11 +133,40 @@ const updateProduct = async (req, res) => {
 }
 
 const deleteProduct = async (req, res) => {
-    const productId = req.params.id
-    await Products.destroy({
-        where: { id: productId }
+    try {
+        const productId = req.params.id
+        await Products.destroy({
+            where: { id: productId }
+        })
+        res.status(204).end()
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
+const getListCategories = async (req, res) => {
+    try {
+        const category = await Categories.findAll()
+        res.status(200).json({
+            message: 'Success get all categories',
+            statusCode: 200,
+            data: category
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
+const getProfileByRequest = (id) => {
+    return Profiles.findOne({
+        where: {
+            UserId: id
+        }
     })
-    res.status(204).end()
 }
 
 module.exports = {
@@ -151,5 +175,6 @@ module.exports = {
     getProductSeller,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getListCategories
 }

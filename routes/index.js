@@ -8,7 +8,6 @@ const {
   whoami,
   updateProfile,
   logout,
-  uploadProfileImages,
 } = require("../controllers/UserController");
 const {
   buyProduct,
@@ -27,6 +26,7 @@ const { newToken } = require("../controllers/NewToken");
 const multer = require("multer");
 const path = require("path");
 const router = express.Router();
+const passport = require("passport");
 
 // handle storage using multer
 let storage = multer.diskStorage({
@@ -41,7 +41,20 @@ let storage = multer.diskStorage({
   },
 });
 
-let upload = multer({ storage: storage });
+let upload = multer({ 
+  storage: storage,
+  limits: { fileSize: "10000000" },
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|gif/;
+    const mimeType = fileTypes.test(file.mimetype);
+    const extname = fileTypes.test(path.extname(file.originalname));
+
+    if (mimeType && extname) {
+      return cb(null, true);
+    }
+    cb("File format not allowed!");
+  }, 
+});
 
 // Auth Router
 router.get("/users", verifyToken, getUsers);
@@ -49,13 +62,43 @@ router.get("/user/:id", verifyToken, getUserById);
 router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
+router.get("/logout", (req, res) => {
+  req.logout();
+  res.status(200).send("Logout Success");
+});
 router.get("/whoami", verifyToken, whoami);
-router.post("/profile/update/:id", uploadProfileImages, updateProfile);
+router.put("/profile/update", [verifyToken, upload.single("image")], updateProfile);
 router.get("/token", newToken);
+
+//Auth Google
+router.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/api/v1/login/success",
+    failureRedirect: "/api/v1/login/failed/",
+  }),
+  (req, res) => {
+    res.status(200).json({ success: "User logged in" });
+  }
+);
+
+router.get("/login/success", (req, res) => {
+  res.status(200).send("Login Berhasil!. Logout: GET /api/v1/logout");
+});
+router.get("/login/failed", (req, res) => {
+  res.send(400).json("Something went wrong");
+});
 
 // Product Router
 router.get("/products", handler.getAllProduct);
 router.get("/products/:id", handler.getProduct);
+router.get("/category/list", handler.getListCategories);
 router.get(
   "/seller/products",
   authorize(accessControl.SELLER),
