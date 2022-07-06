@@ -67,11 +67,7 @@ router.get("/logout", (req, res) => {
   res.status(200).send("Logout Success");
 });
 router.get("/whoami", verifyToken, whoami);
-<<<<<<< HEAD
 router.put("/profile/update", [verifyToken, upload.single("image")], updateProfile);
-=======
-router.post("/profile/update/:id", uploadProfileImages, updateProfile);
->>>>>>> dd92613cca46cb75ff748e4baba718559dff3586
 router.get("/token", newToken);
 
 //Auth Google
