@@ -1,6 +1,7 @@
 const { Users, Profiles } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { checkToken, signToken } = require("../services/authService");
 
 const getUsers = async (req, res) => {
   try {
@@ -62,13 +63,10 @@ const register = async (req, res) => {
       },
     });
     if (isEmailRegistered) {
-      return res
-        .status(409)
-        .json({
-          status: 409,
-          message: "Email already exist!",
-        })
-        .end();
+      return res.status(409).json({
+        status: 409,
+        message: "Email already exist!",
+      });
     }
     const user = await Users.create({
       email: email,
@@ -91,76 +89,28 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const user = await Users.findAll({
+    const user = await Users.findOne({
       where: {
         email: req.body.email,
       },
     });
-    const match = await bcrypt.compare(req.body.password, user[0].password);
+    const match = await bcrypt.compare(req.body.password, user.password);
     if (!match) {
       return res.status(403).json({
         message: "Username or password do not match!",
         statusCode: 403,
       });
     }
-    const userId = user[0].id;
-    const email = user[0].email;
-    const role = user[0].role;
-    const accessToken = jwt.sign(
-      { userId, email, role },
-      process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: "1d",
-      }
-    );
-    const refreshToken = jwt.sign(
-      { userId, email, role },
-      process.env.REFRESH_TOKEN_SECRET,
-      {
-        expiresIn: "30d",
-      }
-    );
-    await Users.update(
-      { token: refreshToken },
-      {
-        where: {
-          id: userId,
-        },
-      }
-    );
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 30 * 60 * 60 * 1000,
-    });
-    res.status(302).json({
-      message: "Login success!",
-      statusCode: 302,
-      accessToken: accessToken,
-    });
+    req.user = { id: user.id, email: user.email, role: user.role };
+    signToken(req, res);
   } catch (error) {
     console.log(error);
   }
 };
 
-// To fixed: who am i
 const whoami = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
   try {
-    if (!refreshToken) {
-      res.status(204).json({ msg: "Please Login First!", statusCode: 204 });
-    } else {
-      const user = await Users.findOne({
-        include: {
-          model: Profiles,
-          required: true,
-          attributes: ["image", "name", "address", "no_hp"],
-        },
-        where: {
-          token: refreshToken,
-        },
-      });
-      res.status(200).json({ msg: user });
-    }
+    checkToken(req, res);
   } catch (error) {
     console.log(error);
   }
@@ -170,33 +120,8 @@ const logout = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   try {
     if (!refreshToken) {
-      // const googleLogout = await Users.findOne({
-      //   where: {
-      //     googleId: req.profile.googleId,
-      //   },
-      // });
-      // if (googleLogout) {
-      //   req.logout();
-      // }
       return res.sendStatus(204);
     }
-    const user = await Users.findOne({
-      where: {
-        token: refreshToken,
-      },
-    });
-    if (!user) {
-      return res.sendStatus(204);
-    }
-    const userId = user.id;
-    await Users.update(
-      { token: null },
-      {
-        where: {
-          id: userId,
-        },
-      }
-    );
     res.clearCookie("refreshToken");
     return res
       .status(200)
@@ -207,8 +132,7 @@ const logout = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const UserId = req.user.userId;
-  const { name, city, address, no_hp } = req.body;
+  const { UserId, name, city, address, no_hp } = req.body;
   const image = req.file.filename;
   try {
     if (UserId != req.user.userId) {
