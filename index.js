@@ -21,6 +21,4 @@ app.use("/api/v1", router);
 app.use("/upload/images", express.static("./upload/images"));
 
 // listen on port
-app.listen(PORT, () =>
-  console.log("Server running at http://localhost:", PORT)
-);
+app.listen(PORT, () => console.log("Server running at http://localhost:",PORT));

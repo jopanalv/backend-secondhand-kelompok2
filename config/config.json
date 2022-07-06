@@ -20,10 +20,10 @@
     }
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "secondhand_production",
-    "host": "127.0.0.1",
+    "username": "mwevctyrjsrvfo",
+    "password": "39be0be2376f5815e22ff65a168a186d0bbc3ca3167999fd125dd77e8eb0798e",
+    "database": "d5k8hm0vtj787s",
+    "host": "ec2-3-222-74-92.compute-1.amazonaws.com",
     "dialect": "postgres",
     "dialectOptions": {
       "ssl": {
