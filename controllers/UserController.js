@@ -132,10 +132,11 @@ const logout = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const { UserId, name, city, address, no_hp } = req.body;
-  const image = req.file.filename;
+  const { name, city, address, no_hp } = req.body;
+  const image = req.body.file;
+  console.log(image)
   try {
-    if (UserId != req.user.userId) {
+    if (!req.user.userId) {
       return res.status(403).json({
         message: "Cannot update profile!",
         statusCode: 403,
@@ -146,14 +147,14 @@ const updateProfile = async (req, res) => {
       { image, name, city, address, no_hp },
       {
         where: {
-          UserId,
+          UserId: req.user.userId,
         },
       }
     );
     const afterUpdate = await Profiles.findOne({
       attributes: ["image", "name", "address", "no_hp"],
       where: {
-        id: UserId,
+        UserId: req.user.userId,
       },
     });
     res.status(200).json({

@@ -34,27 +34,13 @@ let storage = multer.diskStorage({
     cb(null, "upload/images");
   },
   filename: function (req, file, cb) {
-    cb(
-      null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-    );
+    let filename = file.originalname
+    req.body.file = filename
+    cb(null, filename);
   },
 });
 
-let upload = multer({
-  storage: storage,
-  limits: { fileSize: "10000000" },
-  fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg|jpg|png|gif/;
-    const mimeType = fileTypes.test(file.mimetype);
-    const extname = fileTypes.test(path.extname(file.originalname));
-
-    if (mimeType && extname) {
-      return cb(null, true);
-    }
-    cb("File format not allowed!");
-  },
-});
+let upload = multer({storage: storage});
 
 // Auth Router
 router.get("/users", verifyToken, getUsers);

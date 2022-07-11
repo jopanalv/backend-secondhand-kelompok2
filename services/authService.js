@@ -2,8 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const checkToken = (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = req.headers.authorization?.split(" ")[1];
     console.log("Token,", token);
     if (token == null) return res.sendStatus(401);
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -21,24 +20,24 @@ const checkToken = (req, res) => {
 const signToken = (req, res) => {
   try {
     const refreshToken = jwt.sign(
-      { userId: req.user.id, email: req.user.email, role: null },
+      { userId: req.user.id, email: req.user.email, role: req.user.role },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
     const accessToken = jwt.sign(
-      { userId: req.user.id, email: req.user.email, role: null },
+      { userId: req.user.id, email: req.user.email, role: req.user.role },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    return res.status(302).json({
+    return res.status(200).json({
       status: 302,
       success: "User logged in",
-      AccessToken: accessToken,
+      accessToken: accessToken,
     });
   } catch (error) {
     console.log(error);
