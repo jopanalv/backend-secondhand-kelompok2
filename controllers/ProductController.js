@@ -69,7 +69,7 @@ const createProduct = async (req, res) => {
         price,
     } = req.body;
     const userId = req.id
-    const image = req.file.filename
+    const image = req.body.file
     try {
         const profile = await getProfileByRequest(userId)
         const ProfileId = profile.id
