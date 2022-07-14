@@ -1,6 +1,5 @@
 const { Users, Profiles } = require("../models");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { checkToken, signToken } = require("../services/authService");
 
 const getUsers = async (req, res) => {
@@ -17,7 +16,11 @@ const getUsers = async (req, res) => {
       .status(200)
       .json({ message: "Success get all users", statusCode: 200, data: users });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
@@ -48,12 +51,21 @@ const getUserById = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
 const register = async (req, res) => {
   const { name, email, password, role } = req.body;
+  if (!name || !email || !password || !role) {
+    return res
+      .status(400)
+      .json({ status: 400, message: "Data cannot be empty!" });
+  }
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
   try {
@@ -83,7 +95,11 @@ const register = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
@@ -104,7 +120,11 @@ const login = async (req, res) => {
     req.user = { id: user.id, email: user.email, role: user.role };
     signToken(req, res);
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
@@ -112,7 +132,11 @@ const whoami = async (req, res) => {
   try {
     checkToken(req, res);
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
@@ -127,14 +151,17 @@ const logout = async (req, res) => {
       .status(200)
       .json({ statusCode: 200, success: true, message: "Logout Successfully" });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
 const updateProfile = async (req, res) => {
   const { name, city, address, no_hp } = req.body;
   const image = req.body.file;
-  console.log(image)
   try {
     if (!req.user.userId) {
       return res.status(403).json({
@@ -163,7 +190,11 @@ const updateProfile = async (req, res) => {
       data: afterUpdate,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 module.exports = {
