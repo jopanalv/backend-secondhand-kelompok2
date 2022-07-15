@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
 
       this.belongsTo(models.Categories);
 
+      this.hasMany(models.Wishlist, {
+        foreignKey: 'ProductId'
+      });
+
       this.hasMany(models.Transactions, {
         foreignKey: 'ProductId'
       });

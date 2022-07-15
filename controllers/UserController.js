@@ -29,7 +29,7 @@ const getUserById = async (req, res) => {
       include: {
         model: Profiles,
         required: true,
-        attributes: ["image", "name", "address", "no_hp"],
+        attributes: ["image", "name", "address", "no_hp", "city"],
       },
       where: {
         id: userId,

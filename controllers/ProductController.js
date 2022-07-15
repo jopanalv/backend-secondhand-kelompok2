@@ -1,4 +1,4 @@
-const { Products, Profiles, Categories } = require('../models');
+const { Products, Profiles, Categories, Wishlist } = require('../models');
 
 const getAllProduct = async (req, res) => {
     try {
@@ -24,7 +24,7 @@ const getProduct = async (req, res) => {
             include: {
                 model: Profiles,
                 required: true,
-                attributes: ['image', 'name', 'address', 'no_hp']
+                attributes: ['image', 'name', 'address', 'no_hp', 'city']
             },
             where: {
                 id: productId
@@ -70,6 +70,7 @@ const createProduct = async (req, res) => {
     } = req.body;
     const userId = req.id
     const image = req.body.file
+    console.log(userId)
     try {
         const profile = await getProfileByRequest(userId)
         const ProfileId = profile.id
@@ -77,7 +78,8 @@ const createProduct = async (req, res) => {
             where: { ProfileId: ProfileId }
         })
         if (totalRecord >= 4) {
-            res.json({
+            res.status(400).json({
+                statusCode: 400,
                 message: 'Jumlah post produk maksimal 4'
             })
         } else {
@@ -161,6 +163,76 @@ const getListCategories = async (req, res) => {
     }
 }
 
+const addWishlist = async (req, res) => {
+    const buyerId = req.id
+    const productId = req.params.id
+    try {
+        const seller = await Products.findOne({
+            where: {
+                id: productId
+            }
+        })
+        const wishlist = await Wishlist.create({
+            BuyerId: buyerId,
+            ProductId: productId,
+            SellerId: seller.ProfileId
+        })
+        res.status(200).json({
+            message: 'Success add wishlist',
+            statusCode: 200,
+            data: wishlist
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
+const getWishlist = async (req, res) => {
+    const buyerId = req.id
+    try {
+        const wishlist = await Wishlist.findAll({
+            where: {
+                BuyerId: buyerId
+            }
+        })
+        res.status(200).json({
+            message: 'Success get wishlist',
+            statusCode: 200,
+            data: wishlist
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
+const getWishlistedProduct = async (req, res) => {
+    const sellerId = req.id
+    try {
+        const wishlist = await Wishlist.findAll({
+            include:{
+                model: Products,
+                required: true
+            },
+            where: {
+                SellerId: sellerId
+            }
+        })
+        res.status(200).json({
+            message: 'Success get wishlisted product',
+            statusCode: 200,
+            data: wishlist
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
 const getProfileByRequest = (id) => {
     return Profiles.findOne({
         where: {
@@ -176,5 +248,8 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
-    getListCategories
+    getListCategories,
+    addWishlist,
+    getWishlist,
+    getWishlistedProduct
 }
