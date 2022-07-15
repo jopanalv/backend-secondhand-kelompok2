@@ -110,11 +110,17 @@ const login = async (req, res) => {
         email: req.body.email,
       },
     });
+    if (!user) {
+      return res.status(404).json({
+        message: "Email is not registered!",
+        statusCode: 404,
+      });
+    }
     const match = await bcrypt.compare(req.body.password, user.password);
     if (!match) {
-      return res.status(403).json({
+      return res.status(401).json({
         message: "Username or password do not match!",
-        statusCode: 403,
+        statusCode: 401,
       });
     }
     req.user = { id: user.id, email: user.email, role: user.role };
