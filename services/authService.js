@@ -3,17 +3,20 @@ const jwt = require("jsonwebtoken");
 const checkToken = (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
-    console.log("Token,", token);
     if (token == null) return res.sendStatus(401);
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     return res
       .status(201)
       .json({ status: 201, message: "Data found!", data: decoded });
   } catch (error) {
-    console.log(error);
     if (error == "TokenExpiredError: jwt expired") {
       return res.status(403).json({ status: 403, message: "Token Expired!" });
     }
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
@@ -40,7 +43,11 @@ const signToken = (req, res) => {
       accessToken: accessToken,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
@@ -82,7 +89,11 @@ const newToken = async (req, res) => {
       }
     );
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
   }
 };
 
