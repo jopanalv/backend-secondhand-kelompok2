@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Transactions, {
         foreignKey: "ProfileId",
       });
+
+      this.hasMany(models.Wishlist);
     }
   }
   Profiles.init(

@@ -40,7 +40,7 @@ let storage = multer.diskStorage({
   },
 });
 
-let upload = multer({storage: storage});
+let upload = multer({ storage: storage });
 
 // Auth Router
 router.get("/users", verifyToken, getUsers);
@@ -87,11 +87,14 @@ router.get(
   authorize(accessControl.SELLER),
   handler.getProductSeller
 );
+router.get("/buyer/wishlist/list", authorize(accessControl.BUYER), handler.getWishlist);
+router.get("/seller/wishlist/list", authorize(accessControl.SELLER), handler.getWishlistedProduct);
 router.post(
   "/products",
   [authorize(accessControl.SELLER), upload.single("image")],
   handler.createProduct
 );
+router.post("/products/wishlist/:id", authorize(accessControl.BUYER), handler.addWishlist);
 router.put(
   "/products/:id",
   [authorize(accessControl.SELLER), upload.single("image")],
