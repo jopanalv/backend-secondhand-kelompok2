@@ -20,10 +20,15 @@ const detailTransaction = async (req, res) => {
                 id: transactionId
             }
         })
+        const product = await Products.findOne({
+            where: {
+                id: transaction.ProductId
+            }
+        })
         res.status(200).json({
             message: 'Success get detail transaction',
             statusCode: 200,
-            data: transaction
+            data: {transaction, product}
         })
     } catch (error) {
         res.json({
@@ -65,6 +70,10 @@ const getNotifBuyer = async (req, res) => {
 
     try {
         const notifBuyer = await Transactions.findAll({
+            include: {
+                model: Products,
+                required: true,
+            },
             where: {
                 ProfileId: buyerId,
                 status: statusTransaction.ACCEPT
@@ -145,6 +154,7 @@ const buyProduct = async (req, res) => {
         })
         if (buyer.address === null || buyer.no_hp === null) {
             res.json({
+                statusCode: 400,
                 message: 'Lengkapi profile terlebih dahulu!'
             })
         } else {
