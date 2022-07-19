@@ -152,7 +152,10 @@ const logout = async (req, res) => {
     if (!refreshToken) {
       return res.sendStatus(204);
     }
+
+    res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
+    req.logout();
     return res
       .status(200)
       .json({ statusCode: 200, success: true, message: "Logout Successfully" });
@@ -203,6 +206,44 @@ const updateProfile = async (req, res) => {
     });
   }
 };
+
+const updateRole = async (req, res) => {
+  const { role } = req.body;
+  try {
+    if (req.user.role != null) {
+      return res.status(201).redirect("http://localhost:3000/");
+    }
+    if (!req.user.userId) {
+      return res
+        .status(403)
+        .json({ status: 403, message: "Please login first!" })
+        .redirect("/");
+    }
+    await Users.update(
+      { role },
+      {
+        where: {
+          UserId: req.user.userId,
+        },
+      }
+    );
+    const updatedRole = await Users.findOne({
+      where: { UserId: req.user.userId },
+    });
+    res.status(200).json({
+      message: "Update role Success!",
+      statusCode: 200,
+      data: updatedRole,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: "Something went wrong!",
+      error: error.stack,
+    });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
@@ -210,5 +251,6 @@ module.exports = {
   login,
   whoami,
   updateProfile,
+  updateRole,
   logout,
 };
