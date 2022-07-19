@@ -10,6 +10,7 @@ const cookieSession = require("cookie-session");
 const passport = require("passport");
 const initializePassport = require("./config/passport");
 
+initializePassport(passport);
 dotenv.config();
 
 app.use(express.json());

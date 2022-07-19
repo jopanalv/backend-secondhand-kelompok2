@@ -8,7 +8,10 @@ const {
   whoami,
   updateProfile,
   logout,
+<<<<<<< HEAD
   updateRole,
+=======
+>>>>>>> 3fb2bad0b10e6a2e85ccf44c9d59597c89a53ac7
 } = require("../controllers/UserController");
 const {
   buyProduct,
@@ -41,7 +44,20 @@ let storage = multer.diskStorage({
   },
 });
 
-let upload = multer({ storage: storage });
+let upload = multer({ 
+  storage: storage,
+  limits: { fileSize: "10000000" },
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|gif/;
+    const mimeType = fileTypes.test(file.mimetype);
+    const extname = fileTypes.test(path.extname(file.originalname));
+
+    if (mimeType && extname) {
+      return cb(null, true);
+    }
+    cb("File format not allowed!");
+  }, 
+});
 
 // Auth Router
 router.get("/users", verifyToken, getUsers);

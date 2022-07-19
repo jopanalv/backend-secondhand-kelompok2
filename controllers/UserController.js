@@ -150,6 +150,14 @@ const logout = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   try {
     if (!refreshToken) {
+      // const googleLogout = await Users.findOne({
+      //   where: {
+      //     googleId: req.profile.googleId,
+      //   },
+      // });
+      // if (googleLogout) {
+      //   req.logout();
+      // }
       return res.sendStatus(204);
     }
 
