@@ -50,7 +50,8 @@ const getNotifSeller = async (req, res) => {
                 }
             },
             where: {
-                status: statusTransaction.PENDING
+                status: statusTransaction.PENDING,
+                status: statusTransaction.ACCEPT
             }
         })
         res.status(200).json({
