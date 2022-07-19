@@ -47,13 +47,13 @@ const signToken = (req, res) => {
     }
 
     return res.status(200).json({
-      status: 302,
-      success: "User logged in",
+      statusCode: 302,
+      message: "Login success!",
       accessToken: accessToken,
     });
   } catch (error) {
     return res.status(500).json({
-      status: 500,
+      statusCode: 500,
       message: "Something went wrong!",
       error: error.stack,
     });

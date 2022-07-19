@@ -111,7 +111,7 @@ const updateProduct = async (req, res) => {
         CategoryId,
         price
     } = req.body;
-    const image = req.file.filename
+    const image = req.body.file
     try {
         const product = await Products.findOne({
             where: { id: productId }

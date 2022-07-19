@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Products);
+      // this.belongsTo(models.Profiles);
     }
   }
   Wishlist.init({
