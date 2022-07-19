@@ -8,6 +8,7 @@ const {
   whoami,
   updateProfile,
   logout,
+  updateRole,
 } = require("../controllers/UserController");
 const {
   buyProduct,
@@ -22,7 +23,7 @@ const {
 } = require("../controllers/TransactionController");
 const { authorize } = require("../middleware/Authorize");
 const { verifyToken } = require("../middleware/verifyToken");
-const { signToken } = require("../services/authService");
+const { signToken, verifyRole } = require("../services/authService");
 const { newToken } = require("../services/authService");
 const multer = require("multer");
 const path = require("path");
@@ -34,8 +35,8 @@ let storage = multer.diskStorage({
     cb(null, "upload/images");
   },
   filename: function (req, file, cb) {
-    let filename = file.originalname
-    req.body.file = filename
+    let filename = file.originalname;
+    req.body.file = filename;
     cb(null, filename);
   },
 });
@@ -78,6 +79,11 @@ router.get(
     signToken(req, res);
   }
 );
+router.get("/auth/google/googleAccessToken", (req, res) => {
+  verifyRole(req, res);
+});
+router.put("/profile/role", verifyToken, updateRole);
+
 // Product Router
 router.get("/products", handler.getAllProduct);
 router.get("/products/:id", handler.getProduct);
@@ -87,14 +93,26 @@ router.get(
   authorize(accessControl.SELLER),
   handler.getProductSeller
 );
-router.get("/buyer/wishlist/list", authorize(accessControl.BUYER), handler.getWishlist);
-router.get("/seller/wishlist/list", authorize(accessControl.SELLER), handler.getWishlistedProduct);
+router.get(
+  "/buyer/wishlist/list",
+  authorize(accessControl.BUYER),
+  handler.getWishlist
+);
+router.get(
+  "/seller/wishlist/list",
+  authorize(accessControl.SELLER),
+  handler.getWishlistedProduct
+);
 router.post(
   "/products",
   [authorize(accessControl.SELLER), upload.single("image")],
   handler.createProduct
 );
-router.post("/products/wishlist/:id", authorize(accessControl.BUYER), handler.addWishlist);
+router.post(
+  "/products/wishlist/:id",
+  authorize(accessControl.BUYER),
+  handler.addWishlist
+);
 router.put(
   "/products/:id",
   [authorize(accessControl.SELLER), upload.single("image")],
