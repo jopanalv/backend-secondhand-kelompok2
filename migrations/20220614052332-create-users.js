@@ -14,6 +14,9 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
+      googleId: {
+        type: Sequelize.STRING
+      },
       role: {
         type: Sequelize.STRING
       },

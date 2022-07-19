@@ -19,9 +19,9 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-     const categories = [];
+     const category = [];
 
-     categories.push(
+     category.push(
        ...categoryName.map((name) => {
          const timestamp = new Date();
          return ({
@@ -31,7 +31,7 @@ module.exports = {
          })
        })
      )
-   await queryInterface.bulkInsert('Categories', categories, {})
+   await queryInterface.bulkInsert('Categories', category, {})
   },
 
   async down (queryInterface, Sequelize) {
