@@ -16,8 +16,20 @@ passport.use(
       const currentUser = await Users.findOne({
         where: { googleId: profile.id },
       });
-      if (currentUser) {
+      const emailExist = await Users.findOne({
+        where: {
+          email: email,
+        },
+      });
+      if (!currentUser && emailExist) {
+        await Users.update(
+          { googleId: profile.id },
+          { where: { email: email } }
+        );
+      }
+      if (currentUser || emailExist) {
         // already have the user -> return (login)
+
         return done(null, currentUser);
       } else {
         // register user and return

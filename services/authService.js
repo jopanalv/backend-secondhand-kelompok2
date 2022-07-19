@@ -36,6 +36,15 @@ const signToken = (req, res) => {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
+    console.log("Your path ", req._parsedUrl.pathname);
+    if (req._parsedUrl.pathname == "/auth/google/callback") {
+      return res
+        .cookie("accessToken", accessToken, {
+          httpOnly: true,
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .redirect("/api/v1/auth/google/googleAccessToken");
+    }
 
     return res.status(200).json({
       status: 302,
@@ -96,5 +105,31 @@ const newToken = async (req, res) => {
     });
   }
 };
+const verifyRole = (req, res) => {
+  const token = req.cookies.accessToken;
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res
+        .status(301)
+        .json({ status: 301, message: "Please login again!" });
+    }
+    if (decoded.role == null) {
+      res.status(202).json({
+        status: 202,
+        message: "Google Login, But You don't have a role!",
+        accessToken: req.cookies.accessToken,
+        role: decoded.role,
+      });
+    } else {
+      res.status(200).json({
+        status: 200,
+        message: "Google User Logged In!",
+        accessToken: req.cookies.accessToken,
+        haveRole: true,
+        role: decoded.role,
+      });
+    }
+  });
+};
 
-module.exports = { checkToken, signToken, newToken };
+module.exports = { checkToken, signToken, newToken, verifyRole };
