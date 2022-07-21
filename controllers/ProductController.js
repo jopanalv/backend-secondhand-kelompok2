@@ -24,7 +24,7 @@ const getProduct = async (req, res) => {
             include: {
                 model: Profiles,
                 required: true,
-                attributes: ['image', 'name', 'address', 'no_hp', 'city']
+                attributes: ['id', 'image', 'name', 'address', 'no_hp', 'city']
             },
             where: {
                 id: productId
@@ -214,6 +214,10 @@ const getWishlist = async (req, res) => {
         const wishlist = await Wishlist.findAll({
             where: {
                 BuyerId: buyerId
+            },
+            include: {
+                model: Products,
+                required: true
             }
         })
         res.status(200).json({
