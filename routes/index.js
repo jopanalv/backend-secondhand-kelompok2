@@ -123,7 +123,7 @@ router.delete(
   authorize(accessControl.SELLER),
   handler.deleteProduct
 );
-router.delete("/products/wishlist/:id", authorize(accessControl.BUYER), handler.deleteWishlist);
+router.delete("/buyer/wishlist/:id", authorize(accessControl.BUYER), handler.deleteWishlist);
 
 // Transaction router
 router.get("/notif/buyer", authorize(accessControl.BUYER), getNotifBuyer);
