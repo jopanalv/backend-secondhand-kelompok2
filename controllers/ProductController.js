@@ -189,6 +189,25 @@ const addWishlist = async (req, res) => {
     }
 }
 
+const deleteWishlist = async (req, res) => {
+    const wishlistId = req.params.id
+    try {
+        await Wishlist.destroy({
+            where: {
+                id: wishlistId
+            }
+        })
+        res.status(200).json({
+            statusCode: 200,
+            message: 'Success delete wishlist'
+        })
+    } catch (error) {
+        res.json({
+            message: error.message
+        })
+    }
+}
+
 const getWishlist = async (req, res) => {
     const buyerId = req.id
     try {
@@ -250,6 +269,7 @@ module.exports = {
     deleteProduct,
     getListCategories,
     addWishlist,
+    deleteWishlist,
     getWishlist,
     getWishlistedProduct
 }
