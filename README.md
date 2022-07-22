@@ -63,8 +63,10 @@ Install
     
 Configure Database
     └── Enable mysql module on xampp 
-    └── npx sequelize db:create
-    └── npx sequelize db:migrate
+    └── npm run sequelize db:create
+    └── npm run sequelize db:migrate
+    └── npm run sequelize db:seed
+    
 
 running server...
    └── npm run dev 
