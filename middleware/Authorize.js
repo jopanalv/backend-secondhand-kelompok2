@@ -22,7 +22,8 @@ const authorize = (rolename) => {
         }
         catch (err) {
             res.json({
-                message: err.message
+                statusCode: 401,
+                message: 'Silahkan login terlebih dahulu!'
             })
         }
     }

@@ -99,7 +99,11 @@ const getTransactionHistoryBuyer = async (req, res) => {
         const history = await Transactions.findAll({
             where: {
                 ProfileId: buyerId,
-                status: statusTransaction.SUCCESS
+                status: [statusTransaction.SUCCESS, statusTransaction.CANCEL]
+            },
+            include: {
+                model: Products,
+                required: true
             }
         })
         res.status(200).json({
