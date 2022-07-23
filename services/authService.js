@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 const jwt = require("jsonwebtoken");
 
 const checkToken = (req, res) => {
@@ -47,7 +48,7 @@ const signToken = (req, res) => {
     }
 
     return res.status(200).json({
-      statusCode: 302,
+      statusCode: 200,
       message: "Login success!",
       accessToken: accessToken,
     });

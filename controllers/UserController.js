@@ -12,11 +12,14 @@ const getUsers = async (req, res) => {
         attributes: ["image", "name", "address", "no_hp"],
       },
     });
-    res
-      .status(200)
-      .json({ message: "Success get all users", statusCode: 200, data: users });
+    res.status(200);
+    return res.json({
+      message: "Success get all users",
+      statusCode: 200,
+      data: users,
+    });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       status: 500,
       message: "Something went wrong!",
       error: error.stack,
@@ -39,19 +42,22 @@ const getUserById = async (req, res) => {
       },
     });
     if (!users) {
-      res.status(404).json({
+      res.status(404);
+      return res.json({
         message: "User does not exist",
         statusCode: 404,
       });
     } else {
-      res.status(200).json({
+      res.status(200);
+      return res.json({
         message: "Success get user",
         statusCode: 200,
         data: users,
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    res.status(500);
+    return res.json({
       status: 500,
       message: "Something went wrong!",
       error: error.stack,
@@ -62,9 +68,8 @@ const getUserById = async (req, res) => {
 const register = async (req, res) => {
   const { name, email, password, role } = req.body;
   if (!name || !email || !password || !role) {
-    return res
-      .status(400)
-      .json({ status: 400, message: "Data cannot be empty!" });
+    res.status(400);
+    return res.json({ status: 400, message: "Data cannot be empty!" });
   }
   const salt = await bcrypt.genSalt();
   const hashPassword = await bcrypt.hash(password, salt);
@@ -75,7 +80,8 @@ const register = async (req, res) => {
       },
     });
     if (isEmailRegistered) {
-      return res.status(409).json({
+      res.status(409);
+      return res.json({
         status: 409,
         message: "Email already exist!",
       });
@@ -89,13 +95,15 @@ const register = async (req, res) => {
       UserId: user.id,
       name: name,
     });
-    res.status(201).json({
+    res.status(201);
+    return res.json({
       message: "Register success!",
       statusCode: 201,
       data: user,
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500);
+    return res.json({
       status: 500,
       message: "Something went wrong!",
       error: error.stack,
@@ -111,14 +119,16 @@ const login = async (req, res) => {
       },
     });
     if (!user) {
-      return res.status(404).json({
+      res.status(404);
+      return res.json({
         message: "Email is not registered!",
         statusCode: 404,
       });
     }
     const match = await bcrypt.compare(req.body.password, user.password);
     if (!match) {
-      return res.status(401).json({
+      res.status(401);
+      return res.json({
         message: "Username or password do not match!",
         statusCode: 401,
       });
@@ -126,7 +136,8 @@ const login = async (req, res) => {
     req.user = { id: user.id, email: user.email, role: user.role };
     signToken(req, res);
   } catch (error) {
-    return res.status(500).json({
+    res.status(500);
+    return res.json({
       status: 500,
       message: "Something went wrong!",
       error: error.stack,
@@ -156,11 +167,15 @@ const logout = async (req, res) => {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     req.logout();
-    return res
-      .status(200)
-      .json({ statusCode: 200, success: true, message: "Logout Successfully" });
+    res.status(200);
+    return res.json({
+      statusCode: 200,
+      success: true,
+      message: "Logout Successfully",
+    });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500);
+    return res.json({
       status: 500,
       message: "Something went wrong!",
       error: error.stack,
@@ -173,7 +188,8 @@ const updateProfile = async (req, res) => {
   const image = req.body.file;
   try {
     if (!req.user.userId) {
-      return res.status(403).json({
+      res.status(403);
+      return res.json({
         message: "Cannot update profile!",
         statusCode: 403,
       });
@@ -193,13 +209,15 @@ const updateProfile = async (req, res) => {
         UserId: req.user.userId,
       },
     });
-    res.status(200).json({
+    res.status(200);
+    return res.json({
       message: "Update profile Success!",
       statusCode: 200,
       data: afterUpdate,
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500);
+    return res.json({
       status: 500,
       message: "Something went wrong!",
       error: error.stack,
@@ -211,13 +229,12 @@ const updateRole = async (req, res) => {
   const { role } = req.body;
   try {
     if (req.user.role != null) {
-      return res.status(201).redirect("http://localhost:3000/");
+      res.status(403);
+      return res.json({ status: 403, message: "You already have role!" });
     }
     if (!req.user.userId) {
-      return res
-        .status(403)
-        .json({ status: 403, message: "Please login first!" })
-        .redirect("/");
+      res.status(403);
+      return res.json({ status: 403, message: "Please login first!" });
     }
     await Users.update(
       { role },
@@ -230,13 +247,15 @@ const updateRole = async (req, res) => {
     const updatedRole = await Users.findOne({
       where: { UserId: req.user.userId },
     });
-    res.status(200).json({
+    res.status(200);
+    return res.json({
       message: "Update role Success!",
       statusCode: 200,
       data: updatedRole,
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500);
+    return res.json({
       status: 500,
       message: "Something went wrong!",
       error: error.stack,
