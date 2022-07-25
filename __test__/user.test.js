@@ -194,6 +194,19 @@ describe("Update profile", () => {
     await updateProfile(req, response);
     expect(response.status).toHaveBeenCalledWith(403);
   });
+  it("Should return 400 if input field empty", async () => {
+    const req = {
+      user: { userId: 1 },
+      body: {
+        name: "name",
+        city: "city",
+        address: "",
+        no_hp: "no_hp",
+      },
+    };
+    await updateProfile(req, response);
+    expect(response.status).toHaveBeenCalledWith(400);
+  });
   it("Should return 200 if update profile success", async () => {
     await Profiles.update.mockImplementationOnce();
     await Profiles.findOne.mockImplementationOnce();

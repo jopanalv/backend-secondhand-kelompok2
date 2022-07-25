@@ -194,6 +194,13 @@ const updateProfile = async (req, res) => {
         statusCode: 403,
       });
     }
+    if (!name || !city || !address || !no_hp) {
+      res.status(400);
+      return res.json({
+        status: 400,
+        message: "Please fill in each input field!",
+      });
+    }
 
     await Profiles.update(
       { image, name, city, address, no_hp },
